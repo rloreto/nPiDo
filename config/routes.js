@@ -7,16 +7,17 @@
 // Note: We can require users, articles and other cotrollers because we have
 // set the NODE_PATH to be ./app/controllers (package.json # scripts # start)
 
+const home = require('../server/controllers/home');
 const users = require('../server/controllers/users');
 const articles = require('../server/controllers/articles');
 const comments = require('../server/controllers/comments');
 const tags = require('../server/controllers/tags');
 const auth = require('./middlewares/authorization');
 
-const devices = require('../server/controllers/devices');
-const components = require('../server/controllers/components');
-const gpios = require('../server/controllers/gpios');
-const appController = require('../server/controllers/app');
+const devices = require('../server/controllers/api/devices');
+const components = require('../server/controllers/api/components');
+const gpios = require('../server/controllers/api/gpios');
+const appController = require('../server/controllers/api/app');
 /**
  * Route middlewares
  */
@@ -103,7 +104,7 @@ module.exports = function(app, passport) {
   app.delete('/articles/:id', articleAuth, articles.destroy);
 
   // home route
-  app.get('/', articles.index);
+  app.get('/', home.index);
 
   // comment routes
   app.param('commentId', comments.load);

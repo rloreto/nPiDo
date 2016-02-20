@@ -5,7 +5,7 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var ComponentActions = require('../services/componentActions');
+var ComponentActions = require('../../services/componentActions');
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 const Component = mongoose.model('Component');
