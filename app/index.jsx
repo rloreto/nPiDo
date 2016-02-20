@@ -16,7 +16,7 @@ const _hrefProject = () => {
 ReactDOM.render((
   <App className={style.app}>
     <AppBarToolbox fixed flat className={style.appbar}>
-      <h1>React Toolbox <small>Spec</small></h1>
+      <h1>PiDo <small>home</small></h1>
       <ButtonToolbox
         accent
         className={style.github}
