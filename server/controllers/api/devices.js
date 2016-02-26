@@ -4,7 +4,7 @@
  * @description :: Server-side logic for managing devices
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
- var DeviceService = require('../../services/Device');
+ var DeviceService = require('../../services/device');
  const mongoose = require('mongoose');
  mongoose.Promise = require('bluebird');
  const Device = mongoose.model('Device');

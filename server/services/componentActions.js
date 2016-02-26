@@ -1,5 +1,5 @@
 var rp = require('request-promise');
-var Device = require('./Device');
+var Device = require('./device');
 
 require('array.prototype.find');
 
