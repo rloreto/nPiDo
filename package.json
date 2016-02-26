@@ -99,7 +99,7 @@
   },
   "scripts": {
     "start": "NODE_ENV=development ./node_modules/.bin/nodemon ./server.js",
-    "prod": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.2/nPiDo PORT=3001 ./node_modules/.bin/nodemon ./server.js",
+    "prod": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.2/nPiDo PORT=80 ./node_modules/.bin/nodemon ./server.js",
     "debug": "NODE_ENV=development ./node_modules/.bin/nodemon --debug ./server.js",
     "build": "rimraf dist && set NODE_ENV=production && webpack --config ./webpack.production.config.js --progress --profile --colors",
     "lint": "eslint ./ --ext .js,.jsx",
