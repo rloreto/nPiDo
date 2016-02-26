@@ -1,43 +1,55 @@
-const path = require('path');
-const webpack = require('webpack');
-const webpackConfig = require('./webpack.config');
 
+const path = require('path');
+const express = require('express');
+const webpack = require('webpack');
+const webpackMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const webpackConfig = require('./webpack.config.js');
 const fs = require('fs');
 const join = require('path').join;
-const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const config = require('./config/config');
-
 const models = join(__dirname, 'server/models');
-const port = process.env.PORT || 3000;
 
-
+const isDeveloping = process.env.NODE_ENV !== 'production';
+const port = isDeveloping ? 3000 : process.env.PORT;
 var securityOptions = {
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('certificate.pem'),
     requestCert: true
 };
 
-
 const app = express();
 var secureServer = require('https').createServer(securityOptions, app);
 
-const compiler = webpack(webpackConfig);
+if (isDeveloping) {
+  const compiler = webpack(webpackConfig);
+  const middleware = webpackMiddleware(compiler, {
+    publicPath: webpackConfig.output.publicPath,
+    contentBase: 'src',
+    stats: {
+      colors: true,
+      hash: false,
+      timings: true,
+      chunks: false,
+      chunkModules: false,
+      modules: false
+    }
+  });
 
-app.use(require('webpack-dev-middleware')(compiler, {
-  noInfo: true,
-  publicPath: webpackConfig.output.publicPath,
-  stats: {
-    colors: true
-  }
-}));
-
-app.use(require('webpack-hot-middleware')(compiler));
-
-
-
-
+  app.use(middleware);
+  app.use(webpackHotMiddleware(compiler));
+  app.get('*', function response(req, res) {
+    res.write(middleware.fileSystem.readFileSync(path.join(__dirname, 'dist/index.html')));
+    res.end();
+  });
+} else {
+  app.use(express.static(__dirname + '/dist'));
+  app.get('*', function response(req, res) {
+    res.sendFile(path.join(__dirname, 'dist/index.html'));
+  });
+}
 
 // Bootstrap models
 fs.readdirSync(models)
@@ -64,3 +76,16 @@ function connect () {
   var options = { server: { socketOptions: { keepAlive: 1 } } };
   return mongoose.connect(config.db, options).connection;
 }
+
+/*
+app.listen(port, '0.0.0.0', function onStart(err) {
+  if (err) {
+    console.log(err);
+  }
+  console.info('==> 🌎 Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
+});
+
+function connect () {
+  var options = { server: { socketOptions: { keepAlive: 1 } } };
+  return mongoose.connect(config.db, options).connection;
+}*/

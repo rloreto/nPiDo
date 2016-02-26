@@ -1,20 +1,17 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const StatsPlugin = require('stats-webpack-plugin');
 
 module.exports = {
-  context: __dirname,
-  devtool: 'inline-source-map',
   entry: [
-    'webpack-hot-middleware/client?reload=true',
-    './app/index.jsx'
+    path.join(__dirname, 'app/index.jsx')
   ],
   output: {
     path: path.join(__dirname, '/dist/'),
-    filename: '[name].js',
-    publicPath: '/'
+    filename: '[name]-[hash].min.js'
   },
   resolve: {
     extensions: ['', '.jsx', '.scss', '.js', '.json'],
@@ -23,6 +20,29 @@ module.exports = {
       path.resolve(__dirname, './node_modules')
     ]
   },
+  plugins: [
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new HtmlWebpackPlugin({
+     template: 'app/index.tpl.html',
+     inject: 'body',
+     filename: 'index.html'
+    }),
+    new ExtractTextPlugin('[name]-[hash].min.css'),
+    new ExtractTextPlugin('react-toolbox.css', { allChunks: true }),
+    /*new webpack.optimize.UglifyJsPlugin({
+         compressor: {
+           warnings: false,
+           screw_ie8: true
+         }
+       }),*/
+       new StatsPlugin('webpack.stats.json', {
+         source: false,
+         modules: false
+       }),
+       new webpack.DefinePlugin({
+         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+       })
+  ],
   module: {
     loaders: [
       {
@@ -42,18 +62,5 @@ module.exports = {
     theme: path.join(__dirname, 'app/toolbox-theme.scss')
   },
   postcss: [autoprefixer],
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'app/index.tpl.html',
-      inject: 'body',
-      filename: 'index.html'
-    }),
-    new ExtractTextPlugin('react-toolbox.css', { allChunks: true }),
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development')
-    })
-  ]
+
 };
