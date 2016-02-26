@@ -23,8 +23,19 @@ var securityOptions = {
 const app = express();
 var secureServer = require('https').createServer(securityOptions, app);
 
+// Bootstrap models
+fs.readdirSync(models)
+  .filter(file => ~file.indexOf('.js'))
+  .forEach(file => require(join(models, file)));
+
+// Bootstrap routes
+require('./config/passport')(passport);
+require('./config/express')(app, passport);
+require('./config/routes')(app, passport);
+
 if (isDeveloping) {
-  const compiler = webpack('./webpack.config.js');
+  const webpackConfig = require('./webpack.config.js');
+  const compiler = webpack(webpackConfig);
   const middleware = webpackMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
     contentBase: 'src',
@@ -51,15 +62,7 @@ if (isDeveloping) {
   });
 }
 
-// Bootstrap models
-fs.readdirSync(models)
-  .filter(file => ~file.indexOf('.js'))
-  .forEach(file => require(join(models, file)));
 
-// Bootstrap routes
-require('./config/passport')(passport);
-require('./config/express')(app, passport);
-require('./config/routes')(app, passport);
 
 connect()
   .on('error', console.log)

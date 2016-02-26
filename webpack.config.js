@@ -1,19 +1,19 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-cons HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   context: __dirname,
   devtool: 'inline-source-map',
   entry: [
-    'webpack-hot-middleware/client?reload=true',
+    'webpack-hot-middleware/client',
     './app/index.jsx'
   ],
   output: {
-    path: path.join(__dirname, '/dist/'),
-    filename: '[name].js',
+    path: path.join(__dirname, 'build'),
+    filename: 'bundle.js',
     publicPath: '/'
   },
   resolve: {
@@ -43,13 +43,7 @@ module.exports = {
   },
   postcss: [autoprefixer],
   plugins: [
-    new HtmlWebpackPlugin({
-      template: 'app/index.tpl.html',
-      inject: 'body',
-      filename: 'index.html'
-    }),
     new ExtractTextPlugin('react-toolbox.css', { allChunks: true }),
-    new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
