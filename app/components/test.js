@@ -25,8 +25,8 @@ const ButtonTest = () => (
 
     </section>
     <section>
-      <h5>Buttons</h5>
-      <p>lorem ipsum...</p>
+      <h5>Alumbrado</h5>
+      <p></p>
 
       <Button href='http://github.com/javivelasco' target='_blank' raised>
         <GithubIcon/>
