@@ -1,6 +1,7 @@
 var rp = require('request-promise');
 var Device = require('./device');
 
+
 require('array.prototype.find');
 
 module.exports = {

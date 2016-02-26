@@ -9,6 +9,7 @@
 var GpioObj = null ;//require('onoff').Gpio;
 var sleep = require('sleep');
 var Device = require('../../services/device');
+
 var localDevice = null;
 
 if(!localDevice){
