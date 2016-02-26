@@ -4,7 +4,7 @@ const express = require('express');
 const webpack = require('webpack');
 const webpackMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
-const webpackConfig = require('./webpack.config.js');
+
 const fs = require('fs');
 const join = require('path').join;
 const mongoose = require('mongoose');
@@ -24,7 +24,7 @@ const app = express();
 var secureServer = require('https').createServer(securityOptions, app);
 
 if (isDeveloping) {
-  const compiler = webpack(webpackConfig);
+  const compiler = webpack('./webpack.config.js');
   const middleware = webpackMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
     contentBase: 'src',
