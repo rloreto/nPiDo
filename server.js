@@ -2,6 +2,7 @@
 const path = require('path');
 const express = require('express');
 const webpack = require('webpack');
+
 const webpackMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 
@@ -31,14 +32,16 @@ fs.readdirSync(models)
 // Bootstrap routes
 require('./config/passport')(passport);
 require('./config/express')(app, passport);
-require('./config/routes')(app, passport);
+
 
 if (isDeveloping) {
   const webpackConfig = require('./webpack.config.js');
+
   const compiler = webpack(webpackConfig);
   const middleware = webpackMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
     contentBase: 'src',
+    hot: true,
     stats: {
       colors: true,
       hash: false,
@@ -46,12 +49,16 @@ if (isDeveloping) {
       chunks: false,
       chunkModules: false,
       modules: false
-    }
+    },
+    watchOptions: {
+		aggregateTimeout: 300,
+		poll: true
+	},
   });
 
   app.use(middleware);
   app.use(webpackHotMiddleware(compiler));
-  app.get('*', function response(req, res) {
+  app.get('/index.html', function response(req, res) {
     res.write(middleware.fileSystem.readFileSync(path.join(__dirname, 'dist/index.html')));
     res.end();
   });
@@ -62,33 +69,18 @@ if (isDeveloping) {
   });
 }
 
+require('./config/routes')(app, passport);
 
 
-connect()
-  .on('error', console.log)
-  .on('disconnected', connect)
-  .once('open', listen);
-
-function listen () {
-  if (app.get('env') === 'test') return;
-  app.listen(port);
-  console.log('Express app started on port ' + port);
-}
-
-function connect () {
-  var options = { server: { socketOptions: { keepAlive: 1 } } };
-  return mongoose.connect(config.db, options).connection;
-}
-
-/*
 app.listen(port, '0.0.0.0', function onStart(err) {
   if (err) {
     console.log(err);
   }
-  console.info('==> 🌎 Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
-});
 
-function connect () {
+  console.info('==> 🌎 Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
   var options = { server: { socketOptions: { keepAlive: 1 } } };
-  return mongoose.connect(config.db, options).connection;
-}*/
+
+  var connection = mongoose.connect(config.db, options).connection;
+  console.info('==> 🌎 Connected to mongodb  "%s".', config.db);
+  return connection;
+});

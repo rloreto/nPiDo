@@ -103,9 +103,6 @@ module.exports = function(app, passport) {
   app.put('/articles/:id', articleAuth, articles.update);
   app.delete('/articles/:id', articleAuth, articles.destroy);
 
-  // home route
-  app.get('/', home.index);
-
   // comment routes
   app.param('commentId', comments.load);
   app.post('/articles/:id/comments', auth.requiresLogin, comments.create);

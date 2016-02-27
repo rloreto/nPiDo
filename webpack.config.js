@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const autoprefixer = require('autoprefixer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -8,13 +7,13 @@ module.exports = {
   context: __dirname,
   devtool: 'inline-source-map',
   entry: [
-    'webpack-hot-middleware/client',
-    './app/index.jsx'
+    'webpack-hot-middleware/client?reload=true',
+    path.join(__dirname, 'app/index.jsx')
   ],
   output: {
-    path: path.join(__dirname, 'build'),
-    filename: 'bundle.js',
-    publicPath: '/'
+      path: path.join(__dirname, '/dist/'),
+      filename: '[name].js',
+      publicPath: '/'
   },
   resolve: {
     extensions: ['', '.jsx', '.scss', '.js', '.json'],
@@ -23,6 +22,20 @@ module.exports = {
       path.resolve(__dirname, './node_modules')
     ]
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'app/index.tpl.html',
+      inject: 'body',
+      filename: 'index.html'
+    }),
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin(),
+    new ExtractTextPlugin('react-toolbox.css', { allChunks: true }),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('development')
+    })
+  ],
   module: {
     loaders: [
       {
@@ -40,14 +53,5 @@ module.exports = {
   },
   toolbox: {
     theme: path.join(__dirname, 'app/toolbox-theme.scss')
-  },
-  postcss: [autoprefixer],
-  plugins: [
-    new ExtractTextPlugin('react-toolbox.css', { allChunks: true }),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development')
-    })
-  ]
+  }
 };
