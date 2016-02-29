@@ -4,6 +4,7 @@ var request = require('sync-request');
 var http = require('http');
 const mongoose = require('mongoose');
 const Device = mongoose.model('Device');
+const Component = mongoose.model('Component');
 
 module.exports.init = function(cb) {
 
