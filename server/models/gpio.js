@@ -52,18 +52,14 @@ GpioSchema.pre('remove', function (next) {
   next();
 });
 
-/**
- * Methods
- */
+
 
 GpioSchema.methods = {
 
-  
+
 };
 
-/**
- * Statics
- */
+
 
 GpioSchema.statics = {
 

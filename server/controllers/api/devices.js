@@ -13,6 +13,7 @@
 
 module.exports = {
       join: function(req, res){
+        debugger;
         var port= DeviceService.getAppPort(req);
         var ip = req.body.ip;
       	var name = req.body.ip;

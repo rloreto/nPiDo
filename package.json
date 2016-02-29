@@ -59,6 +59,7 @@
     "request-promise": "^2.0.0",
     "sleep": "^3.0.1",
     "swig": "~1.4.2",
+    "sync-request": "^3.0.0",
     "view-helpers": "~0.1.5",
     "winston": "~2.1.1"
   },

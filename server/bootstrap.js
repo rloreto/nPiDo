@@ -2,6 +2,8 @@ var DeviceService = require('./services/device');
 var rp = require('request-promise');
 var request = require('sync-request');
 var http = require('http');
+const mongoose = require('mongoose');
+const Device = mongoose.model('Device');
 
 module.exports.init = function(cb) {
 
@@ -12,7 +14,7 @@ module.exports.init = function(cb) {
     var totalRetry = 20;
     var ip = DeviceService.getIp();
     console.log(ip);
-
+    debugger;
     Device.find({ isMaster: true}).then(function(device){
 
       if(device && device.length>0 && device[0] && ip === device[0].ip){

@@ -11,6 +11,7 @@ const join = require('path').join;
 const mongoose = require('mongoose');
 const passport = require('passport');
 const config = require('./config/config');
+
 const models = join(__dirname, 'server/models');
 
 const isDeveloping = process.env.NODE_ENV !== 'production';
@@ -28,6 +29,9 @@ var secureServer = require('https').createServer(securityOptions, app);
 fs.readdirSync(models)
   .filter(file => ~file.indexOf('.js'))
   .forEach(file => require(join(models, file)));
+
+// Require bootstrat component
+const bootstrap = require('./server/bootstrap');
 
 // Bootstrap routes
 require('./config/passport')(passport);
@@ -82,5 +86,8 @@ app.listen(port, '0.0.0.0', function onStart(err) {
 
   var connection = mongoose.connect(config.db, options).connection;
   console.info('==> 🌎 Connected to mongodb  "%s".', config.db);
-  return connection;
+
+  console.info('==> Init bootstrap...');
+  bootstrap.init();
+
 });
