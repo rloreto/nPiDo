@@ -244,13 +244,7 @@ module.exports = {
 
   },
   getAppPort: function(req){
-    var baseUrl = req.headers.host;
-    var arr = baseUrl.split(":");
-    var port = 80;
-    if(arr.length === 3){
-      port = parseInt(arr[2]);
-    }
-    return port;
+    return process.env.PORT || 3000;
   },
   getDeviceModel: function(){
 
