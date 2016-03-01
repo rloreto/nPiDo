@@ -12,7 +12,8 @@ const Gpio = mongoose.model('Gpio');
 
 var self = {
   getById: function(req, res) {
-    var id = req.params.id;
+    debugger;
+    var id = req.query.id;
     if (!id) {
       throw new Error('The id "' + id + '" is required.');
       return;
@@ -290,7 +291,7 @@ var self = {
 
   },
   get: function(req, res) {
-    var filter = req.param('filter') || {};
+    var filter = req.params.filter || {};
     Component.find(filter).populate('gpios')
       .exec()
       .catch(function(e) {

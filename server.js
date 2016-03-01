@@ -87,7 +87,7 @@ app.listen(port, '0.0.0.0', function onStart(err) {
   var connection = mongoose.connect(config.db, options).connection;
   console.info('==> 🌎 Connected to mongodb  "%s".', config.db);
 
-  console.info('==> Init bootstrap...');
-  bootstrap.init();
+  //console.info('==> Init bootstrap...');
+  //bootstrap.init();
 
 });

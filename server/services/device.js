@@ -249,24 +249,32 @@ module.exports = {
   getDeviceModel: function(){
 
       return new Promise(function(resolve, reject) {
+
+
+
         exec('cat /proc/cpuinfo',
           function (err, stdout) {
             var revision, serial, model, gpios = [];
             if(err) {
-              reject(err);
+              //reject(err);
+              revision= 'a01041';
+            } else {
+              var lines = stdout.split(os.EOL);
+
+              lines.forEach(function(line){
+
+                var arr = line.split(':');
+                if(arr[0].indexOf('Revision') === 0){
+                  revision = arr[1];
+                }
+                if(arr[0].indexOf('Serial') === 0){
+                  serial = arr[1];
+                }
+              });
             }
-            var lines = stdout.split(os.EOL);
 
-            lines.forEach(function(line){
 
-              var arr = line.split(':');
-              if(arr[0].indexOf('Revision') === 0){
-                revision = arr[1];
-              }
-              if(arr[0].indexOf('Serial') === 0){
-                serial = arr[1];
-              }
-            });
+
             if(revision!=null){
               switch (revision.trim()) {
                 case '0002','0003':
@@ -309,6 +317,7 @@ module.exports = {
               });
             }
           });
+
     });
 
   }

@@ -92,9 +92,9 @@ module.exports = function(app, passport) {
     }), users.authCallback);
 
   app.param('userId', users.load);
-
+debugger;
   // article routes
-  app.param('id', articles.load);
+  //app.param('id', articles.load);
   app.get('/articles', articles.index);
   app.get('/articles/new', auth.requiresLogin, articles.new);
   app.post('/articles', auth.requiresLogin, articles.create);
@@ -111,7 +111,6 @@ module.exports = function(app, passport) {
 
   // tag routes
   app.get('/tags/:tag', tags.index);
-
 
 
   app.post('/api/devices/join', devices.join);

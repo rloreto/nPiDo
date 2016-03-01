@@ -9,11 +9,9 @@
  const mongoose = require('mongoose');
  mongoose.Promise = require('bluebird');
  const Device = mongoose.model('Device');
- const Gpio = mongoose.model('Gpio');
 
 module.exports = {
       join: function(req, res){
-        debugger;
         var port= DeviceService.getAppPort(req);
         var ip = req.body.ip;
       	var name = req.body.ip;
@@ -24,7 +22,7 @@ module.exports = {
       		if(req.body.name) {
       			name = req.body.name;
       		}
-    		Gpio.findOne({ ip: ip })
+    		Device.findOne({ ip: ip })
         .exec()
     		.then(function(found){
     			if(found){
