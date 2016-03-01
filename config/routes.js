@@ -92,7 +92,7 @@ module.exports = function(app, passport) {
     }), users.authCallback);
 
   app.param('userId', users.load);
-debugger;
+
   // article routes
   //app.param('id', articles.load);
   app.get('/articles', articles.index);

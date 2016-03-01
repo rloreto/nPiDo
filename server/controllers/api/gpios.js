@@ -18,7 +18,7 @@ if(!localDevice){
   });
 }
 
-module.exports = {
+var self = {
 
 
     reset: function (req, res) {
@@ -115,7 +115,7 @@ module.exports = {
           });
         }
 
-        var error = this._checkNumber(number);
+        var error = self._checkNumber(number);
         if(error){
             console.log(error.message);
             console.log('end changeState');
@@ -129,165 +129,165 @@ module.exports = {
             if(type === 'inOut'){
 
               if(state==='start'){
-                this._setOut(number);
+                self._setOut(number);
                 direction = 'out';
               }
 
               if(state==='stop'){
-                this._setIn(number);
+                self._setIn(number);
                 direction = 'in';
               }
 
               if(state==='on'){
-                this._setOut(number);
+                self._setOut(number);
                 direction = 'out';
               }
 
               if(state==='off'){
-                this._setIn(number);
+                self._setIn(number);
                 direction = 'in';
               }
 
               if(state==='onDimer'){
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(2000000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(500000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(500000);
-                this._setIn(number);
+                self._setIn(number);
 
                 direction = 'in';
               }
 
               if(state==='offDimer'){
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(2000000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(500000);
-                this._setIn(number);
+                self._setIn(number);
 
                 direction = 'in';
               }
               if(state==='low'){
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(2000000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(500000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(lowTime);
-                this._setIn(number);
+                self._setIn(number);
 
                 direction = 'in';
               }
 
               if(state==='mediun'){
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(3500000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(500000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(mediunTime);
-                this._setIn(number);
+                self._setIn(number);
 
                 direction = 'in';
               }
 
               if(state==='hight'){
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(2000000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(500000);
-                this._setIn(number);
+                self._setIn(number);
 
                 sleep.usleep(1000000);
 
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(hightTime);
-                this._setIn(number);
+                self._setIn(number);
 
                 direction = 'in';
               }
 
               if(state==='onoff'){
                 var waitMicroseconds = parseInt(req.param('wait')) || 500000;
-                this._setOut(number);
+                self._setOut(number);
                 sleep.usleep(waitMicroseconds);
-                this._setIn(number);
+                self._setIn(number);
                 direction = 'out';
               }
             } else if(type === 'out01'){
               if(state==='on'){
-                this._setOut(number, 1);
+                self._setOut(number, 1);
                 direction = 'out';
                 value = 1;
               }
 
               if(state==='off'){
-                this._setOut(number, 0);
+                self._setOut(number, 0);
                 direction = 'out';
                 value = 0;
               }
 
               if(state==='onoff'){
                 var waitMicroseconds = parseInt(req.param('wait')) || 500000;
-                this._setOut(number, 1);
+                self._setOut(number, 1);
                 sleep.usleep(waitMicroseconds);
-                this._setOut(number, 0);
+                self._setOut(number, 0);
                 direction = 'out';
                 value = 0;
               }
             } else if(type === 'out10'){
               if(state==='off'){
-                this._setOut(number, 1);
+                self._setOut(number, 1);
                 direction = 'out';
                 value = 1;
               }
 
               if(state==='on'){
-                this._setOut(number, 0);
+                self._setOut(number, 0);
                 direction = 'out';
                 value = 0;
               }
 
               if(state==='onoff'){
                 var waitMicroseconds = parseInt(req.param('wait')) || 500000;
-                this._setOut(number, 1);
+                self._setOut(number, 1);
                 sleep.usleep(waitMicroseconds);
-                this._setOut(number, 0);
+                self._setOut(number, 0);
                 direction = 'out';
                 value = 0;
               }
@@ -316,7 +316,7 @@ module.exports = {
         console.log('begin setGpio');
         var errorMessage;
         var number = req.param('number');
-        var error = this._checkNumber(number);
+        var error = self._checkNumber(number);
         if(error){
             console.log(error.message);
             console.log('end setGpio');
@@ -388,7 +388,7 @@ module.exports = {
     get: function(req, res){
       var number = req.param('number');
       var gpioValue = 0;
-      var error = this._checkNumber(number);
+      var error = self._checkNumber(number);
       if(error){
           console.log(error.message);
           console.log('end get');
@@ -407,7 +407,7 @@ module.exports = {
     getDhtSensor: function(req, res){
       console.log('start getDhtSensor');
       var number = parseInt(req.param('number'));
-      var error = this._checkNumber(number);
+      var error = self._checkNumber(number);
             if(error){
           console.log(error.message);
           console.log('end getDhtSensor');
@@ -496,7 +496,7 @@ module.exports = {
       });
     },
     _setOut: function( number, value){
-      var error = this._checkNumber(number);
+      var error = self._checkNumber(number);
       var _value = 0;
       if(value){
         _value = value;
@@ -517,7 +517,7 @@ module.exports = {
       return null;
     },
     _setIn: function(number){
-      var error = this._checkNumber(number);
+      var error = self._checkNumber(number);
 
 
       if(error){
@@ -538,7 +538,7 @@ module.exports = {
     _setOutValue: function(ip, number, value){
 
 
-        var error = this._checkNumber(number);
+        var error = self._checkNumber(number);
         if(error){
             return error;
         }
@@ -587,3 +587,6 @@ module.exports = {
     }
 
 };
+
+
+module.exports = self;
