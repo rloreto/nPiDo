@@ -293,12 +293,15 @@ module.exports = {
                   break;
                 case 'a01041':
                   model= 'Pi2';
+                case 'a02082':
+                  model= 'Pi3'
                   break;
 
               }
               switch (model) {
                 case 'PiModelBPlus':
                 case 'Pi2':
+                case 'Pi3':
                   gpios = gpiosRpiBPlus;
                   break;
                 case 'PiModelBRev2':
