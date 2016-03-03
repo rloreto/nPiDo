@@ -48,7 +48,7 @@ var self = {
       throw new Error('The state should be "on" or "off"');
     }
 
-    Component.findOne(id).populate('gpios')
+    Component.findOne({_id: id}).populate('gpios')
       .exec()
       .then(function(component) {
         if (!component) {
@@ -84,7 +84,7 @@ var self = {
       throw new Error('The state should be "on","off","change","start","stop","low","mediun" or "hight"');
     }
 
-    Component.findOne(id).populate('gpios')
+    Component.findOne({_id: id}).populate('gpios')
       .exec()
       .then(function(component) {
         if (!component) {
@@ -120,7 +120,7 @@ var self = {
       throw new Error('The state should be "on" or "off"');
     }
 
-    Component.findOne(id).populate('gpios')
+    Component.findOne({_id: id}).populate('gpios')
       .exec()
       .then(function(component) {
         if (!component) {
@@ -158,7 +158,7 @@ var self = {
       throw new Error('The state should be "up", "down",  "0", "25", "50", "75" or "100"');
     }
 
-    return Component.findOne(id).populate('gpios')
+    return Component.findOne({_id: id}).populate('gpios')
       .exec()
       .then(function(component) {
         if (!component) {
@@ -194,7 +194,7 @@ var self = {
       throw new Error('The state should be "on" or "off"');
     }
 
-    Component.findOne(id).populate('gpios')
+    Component.findOne({_id: id}).populate('gpios')
       .exec()
       .then(function(component) {
         if (!component) {
@@ -229,7 +229,7 @@ var self = {
   temperatureSensor: function(req, res) {
     var id = req.param('id');
 
-    Component.findOne(id).populate('gpios')
+    Component.findOne({_id: id}).populate('gpios')
       .exec()
       .then(function(component) {
         if (!component) {
@@ -261,7 +261,7 @@ var self = {
   luminanceSensor: function(req, res) {
     var id = req.param('id');
 
-    Component.findOne(id).populate('gpios')
+    Component.findOne({_id: id}).populate('gpios')
       .exec()
       .then(function(component) {
         if (!component) {
@@ -566,7 +566,7 @@ var self = {
       throw new Error('The id "' + id + '" is required.');
     }
 
-    Component.findOne(id).populate('gpios')
+    Component.findOne({_id: id}).populate('gpios')
       .then(function(component) {
         if (!component) {
           throw new Error('The component "' + id + '" not found.');
