@@ -81,7 +81,6 @@ var self = {
         var errorMessage;
         var value = 0;
         var currentValue = 0;
-        console.log(req.params.all());
 
         if(reqType && reqType !== 'inOut' && reqType !== 'in01' && reqType !== 'out01' && reqType !== 'out10'){
           errorMessage = 'The type should be "inOut", "in01", "out10" or "out01"';
