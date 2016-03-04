@@ -161,20 +161,15 @@ var self = {
       error: message
     };
   },
-  get: function(req, res) {
+  get: wrap(function*(req, res) {
     var filter = req.params.filter || {};
-    Component.find(filter).populate('gpios')
-      .exec()
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
-      });
-  },
+    try {
+      var component = Component.find(filter).populate('gpios').exec();
+      res.json(component);
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
   create: function(req, res) {
     var obj = req.body;
     var type = obj.type;
@@ -430,81 +425,36 @@ var self = {
 
     }
   },
-  destroy: function(req, res) {
-    var id = req.param('id');
-    var currentComponent;
+  remove: wrap(function*(req, res) {
+    var id = req.params.id;
     if (!id) {
-      throw new Error('The id "' + id + '" is required.');
+      res.json(self._getJsonFailedMessage('The id "' + id + '" is required.'));
+      return;
     }
+    try {
+      var component = yield Component.findOne({_id: id}).populate('gpios').exec();
 
-    Component.findOne({
-        _id: id
-      }).populate('gpios')
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component "' + id + '" not found.');
-        }
-        currentComponent = component;
-        if (component.gpios.length === 1) {
-          return Gpio.update({
-            id: component.gpios[0].id
+      if (component && component.gpios) {
+        component.gpios.forEach(wrap(function*(gpio) {
+          yield Gpio.update({
+            _id: gpio.id
           }, {
             owner: null
           });
-        }
-        if (component.gpios.length === 2) {
-          return Gpio.update({
-              id: component.gpios[0].id
-            }, {
-              owner: null
-            })
-            .then(function() {
-              return Gpio.update({
-                id: component.gpios[1].id
-              }, {
-                owner: null
-              });
-            });
-        }
-        if (component.gpios.length === 3) {
-          return Gpio.update({
-              id: component.gpios[0].id
-            }, {
-              owner: null
-            })
-            .then(function() {
-              return Gpio.update({
-                  id: component.gpios[1].id
-                }, {
-                  owner: null
-                })
-                .then(function() {
-                  return Gpio.update({
-                    id: component.gpios[2].id
-                  }, {
-                    owner: null
-                  });
-                });
-            });
-        }
-
-      })
-      .then(function(obj) {
-        console.log(currentComponent);
-        return Component.destroy({
-          id: id
-        });
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
+        }));
+        var result = yield component.remove();
+      } else{
+        res.json(self._getJsonFailedMessage('Component "'+ id +'" not found.'));
+        return;
+      }
+      res.json({
+        status: 'ok',
+        error: 'The component "'+ id +'" was removed.'
       });
-  },
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
   //{ip, number1, number2}
   _createSwitch: function(obj) {
     return self._createComponentGpio('switch', obj.name, obj.ip, {
@@ -794,11 +744,9 @@ var self = {
 
       })
       .catch(function(e) {
-        console.log(e);
         throw e;
       })
       .then(function(a) {
-        console.log(componentId);
         return Gpio.find({
           owner: componentId
         }, "_id").then(function(result) {
@@ -808,13 +756,12 @@ var self = {
               gpios.push(gpio._id);
             });
           }
-          console.log(gpios);
           return Component.update({
             _id: componentId
           }, {
             gpios: gpios
           }).then(function() {
-            return Component.findOne(componentId).populate('gpios');
+            return Component.findOne({_id: componentId}).populate('gpios');
           });
         });
       });

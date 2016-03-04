@@ -126,7 +126,7 @@ module.exports = function(app, passport) {
   app.get('/api/components/testAC/:id', components.testAC);
   app.get('/api/components/temperatureSensor/:id', components.temperatureSensor);
   app.get('/api/components/luminanceSensor/:id', components.luminanceSensor);
-  app.delete('/api/components/:id', components.destroy);
+  app.delete('/api/components/:id', components.remove);
 
 
   app.get('/api/app/ping', appController.ping);
