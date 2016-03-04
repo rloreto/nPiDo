@@ -114,10 +114,7 @@ var self = {
       var result = self._changeOnOffState(id, state, 'temperatureSensor', 1);
       res.json(result);
     } catch (e) {
-      res.json({
-        status: 'failed',
-        error: e.message
-      });
+      res.json(self._getJsonFailedMessage(e.message));
     }
 
   }),
@@ -127,10 +124,7 @@ var self = {
       var result = self._changeOnOffState(id, state, 'luminanceSensor', 1);
       res.json(result);
     } catch (e) {
-      res.json({
-        status: 'failed',
-        error: e.message
-      });
+      res.json();
     }
 
   }),
@@ -141,16 +135,16 @@ var self = {
     }).populate('gpios').exec();
 
     if (!component) {
-      throw new Error('The component' + id + ' not found');
+      return self._getJsonFailedMessage('The component' + id + ' not found');
     }
     if (component && component.type !== requestedType) {
-      throw new Error('The component type should be "' + requestedType + '" not "' + component.type + '".');
+      return self._getJsonFailedMessage('The component type should be "' + requestedType + '" not "' + component.type + '".');
     }
     if (component && !component.gpios) {
-      throw new Error('The component' + id + ' not found');
+      return self._getJsonFailedMessage('The component' + id + ' not found');
     }
     if (component && component.gpios && component.gpios.length !== gpioNumber) {
-      throw new Error('The number of gpios fos the component with id:"' + id + '"should be "' + gpioNumber + '".');
+      return self._getJsonFailedMessage('The number of gpios fos the component with id:"' + id + '"should be "' + gpioNumber + '".');
     }
 
     return yield ComponentActions.changeOnOffState(component, state, 'out01');
