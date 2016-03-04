@@ -2,6 +2,7 @@
 const path = require('path');
 const express = require('express');
 const webpack = require('webpack');
+const wrap = require('co-express');
 
 const webpackMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -76,7 +77,8 @@ if (isDeveloping) {
 require('./config/routes')(app, passport);
 
 
-app.listen(port, '0.0.0.0', function onStart(err) {
+
+app.listen(port, '0.0.0.0', wrap(function* onStart(err) {
   if (err) {
     console.log(err);
   }
@@ -87,7 +89,6 @@ app.listen(port, '0.0.0.0', function onStart(err) {
   var connection = mongoose.connect(config.db, options).connection;
   console.info('==> 🌎 Connected to mongodb  "%s".', config.db);
 
-  //console.info('==> Init bootstrap...');
-  //bootstrap.init();
-
-});
+  console.info('==> Init bootstrap...');
+  yield bootstrap.init();
+}));

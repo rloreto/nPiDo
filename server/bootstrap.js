@@ -5,83 +5,92 @@ var http = require('http');
 const mongoose = require('mongoose');
 const Device = mongoose.model('Device');
 const Component = mongoose.model('Component');
+const suspend = require('suspend');
 
-module.exports.init = function(cb) {
 
+var self = {
+  init: function*(cb) {
     var totalRequest = 0;
-    var completeRequest =0;
-    var errorRequest=0;
-    var number =0;
-    var totalRetry = 20;
+    var completeRequest = 0;
+    var errorRequest = 0;
+    var number = 0;
+    var totalRetry = 100000;
     var ip = DeviceService.getIp();
-    console.log(ip);
-    debugger;
-    Device.find({ isMaster: true}).then(function(device){
+    console.log('Device ip: ' + ip);
+    var masterDevice = yield Device.find({
+      isMaster: true
+    }).exec();
+    if (masterDevice) {
+      var switchComponents = yield Component.find({
+        type: 'switch'
+      }).populate('gpios').exec();
 
-      if(device && device.length>0 && device[0] && ip === device[0].ip){
-        Component.find({ type: 'switch'}).populate('gpios').then(function(components){
+      if (switchComponents && switchComponents.length > 0) {
 
-          totalRequest = components.length;
-          number =1;
-          console.log("Trying to start the switch components...");
-          var id = setInterval(function(){
-            if(completeRequest === totalRequest || number === totalRetry){
-              console.log("Switch inicialize completed");
-              number = totalRetry;
-              clearInterval(id);
-              id= 0;
-              return;
-            }
+        totalRequest = switchComponents.length;
+        number = 0;
+        console.log("Trying to start the switch components...");
+        var id = setInterval(function() {
 
-            console.log("Retry " + number +" of "+ totalRetry);
+          suspend(function*() {
+
             completeRequest = 0;
             errorRequest = 0;
-            components.forEach(function(component){
+            for (var i = 0; i < switchComponents.length; i++) {
+              var component = switchComponents[i];
+              if (component.gpios) {
+                for (var k = 0; k < component.gpios.length; k++) {
+                  if (component.gpios[k].action === 'switch') {
+                    try {
 
-              if(component.gpios){
-                for (var i = 0; i < component.gpios.length; i++) {
-                  if(component.gpios[i].action ==='switch'){
-
-                    return rp({
+                      var response = yield rp({
                         method: 'Get',
-                        uri: "http://" + component.gpios[i].ip + ":"+ DeviceService.getAppPort() +"/api/gpios/" + component.gpios[i].number  ,
+                        uri: "http://" + component.gpios[k].ip + ":" + DeviceService.getAppPort() + "/api/gpios/" + component.gpios[k].number,
                         resolveWithFullResponse: true
-                    }).then(function(response){
+                      });
                       var data = JSON.parse(response.body);
                       var gpio = data.gpio;
-                      if(gpio.mode === 'in'){
-                        return rp({
-                            method: 'Put',
-                            uri: "http://" + component.gpios[i].ip + ":"+ DeviceService.getAppPort() +"/api/gpios/" + component.gpios[i].number +"/action" ,
-                            resolveWithFullResponse: true,
-                            formData: { state: 'on', type: 'inOut' }
-                        }).then(function(result){
-                          completeRequest++;
-                          if(id>0){
-                            console.log("complete " + completeRequest);
-                          }
-                        }, function(){
-                          errorRequest++;
-                          if(id>0){
-                          console.log("error " + errorRequest);
+                      if (gpio.mode === 'in') {
+                        var responseActon = yield rp({
+                          method: 'Put',
+                          uri: "http://" + component.gpios[k].ip + ":" + DeviceService.getAppPort() + "/api/gpios/" + component.gpios[k].number + "/action",
+                          resolveWithFullResponse: true,
+                          formData: {
+                            state: 'on',
+                            type: 'inOut'
                           }
                         });
-                      } else {
                         completeRequest++;
+                        break;
+                      } else {
+                        completeRequest = totalRequest;
+                        break;
                       }
-                    })
-                    break;
+
+                    } catch (e) {
+                      console.log(e.message);
+                    }
                   }
                 }
               }
-            });
+            };
+            if (completeRequest === totalRequest || number === totalRetry) {
+              console.log("Switches initialized successfully");
+              number = totalRetry + 1;
+              clearInterval(id);
+              id = 0;
+            } else {
+              console.log("Retry " + number + " of " + totalRetry);
+            }
 
-            number++;
-          }, 5 * 1000);
-        });
+          })();
+
+          number++;
+        }, 5 * 1000);
       }
+    }
 
-    });
+  }
+}
 
-
-};
+module.exports = self;

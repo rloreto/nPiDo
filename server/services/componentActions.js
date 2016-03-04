@@ -1,11 +1,10 @@
 var rp = require('request-promise');
 var Device = require('./device');
-const wrap = require('co-express');
 
 require('array.prototype.find');
 
 module.exports = {
-  changeOnOffState: wrap(function*(component, state, type) {
+  changeOnOffState: function*(component, state, type) {
 
     var outGpio = null;
     var id = null;
@@ -54,7 +53,7 @@ module.exports = {
     return result.body;
 
 
-  }),
+  },
   changeSwitchState: function(component, state) {
     var inGpio = null;
     var outGpio = null;

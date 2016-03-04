@@ -33,13 +33,18 @@ var self = {
   }),
   socket: wrap(function*(req, res) {
     var state = req.param('state');
+    var type = req.param('type');
     var id = req.param('id');
     if (state !== 'on' && state !== 'off') {
       res.json(self._getJsonFailedMessage('The state should be "on" or "off"'));
     }
 
+    if (type !== 'hight' && type !== 'low') {
+      res.json(self._getJsonFailedMessage('The type should be "hight" or "low"'));
+    }
+
     try {
-      var result = yield self._changeOnOffState(id, state, 'socket', 1, 'out01');
+      var result = yield self._changeOnOffState(id, state, 'socket', 1, type==='hight'?'out01':'out10');
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -128,8 +133,8 @@ var self = {
     }
 
   }),
-  _changeOnOffState: wrap(function*(id, state, requestedType, gpioNumber, type) {
-    type = type | 'inOut';
+  _changeOnOffState: function*(id, state, requestedType, gpioNumber, type) {
+    type = type || 'inOut';
     var component = yield Component.findOne({
       _id: id
     }).populate('gpios').exec();
@@ -148,17 +153,11 @@ var self = {
     }
 
     return yield ComponentActions.changeOnOffState(component, state, type);
-  }),
-  _getJsonFailedMessage(message) {
-    return {
-      status: 'failed',
-      error: message
-    };
   },
   get: wrap(function*(req, res) {
     var filter = req.params.filter || {};
     try {
-      var component = Component.find(filter).populate('gpios').exec();
+      var component = yield Component.find(filter).populate('gpios').exec();
       res.json(component);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -759,6 +758,12 @@ var self = {
           });
         });
       });
+  },
+  _getJsonFailedMessage(message) {
+    return {
+      status: 'failed',
+      error: message
+    };
   },
   _checkGpios: function(ip, gpio1, gpio2, gpio3) {
     var numberToCheck1;
