@@ -39,7 +39,7 @@ var self = {
     }
 
     try {
-      var result = yield self._changeOnOffState(id, state, 'socket', 1);
+      var result = yield self._changeOnOffState(id, state, 'socket', 1, 'out01');
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -54,7 +54,7 @@ var self = {
     }
 
     try {
-      var result = self._changeOnOffState(id, state, 'dimmer', 1);
+      var result = yield self._changeOnOffState(id, state, 'dimmer', 1);
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -69,7 +69,7 @@ var self = {
     }
 
     try {
-      var result = self._changeOnOffState(id, state, 'switch', 3);
+      var result = yield self._changeOnOffState(id, state, 'switch', 3);
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -84,7 +84,7 @@ var self = {
     }
 
     try {
-      var result = self._changeOnOffState(id, state, 'switchBlind', 2);
+      var result = yield self._changeOnOffState(id, state, 'switchBlind', 2);
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -98,7 +98,7 @@ var self = {
       res.json(self._getJsonFailedMessage('The state should be "on" or "off"'));
     }
     try {
-      var result = self._changeOnOffState(id, state, 'switchAudio', 1);
+      var result = yield self._changeOnOffState(id, state, 'switchAudio', 1, 'out01');
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -111,7 +111,7 @@ var self = {
     var id = req.param('id');
 
     try {
-      var result = self._changeOnOffState(id, state, 'temperatureSensor', 1);
+      var result = yield self._changeOnOffState(id, state, 'temperatureSensor', 1);
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
@@ -121,15 +121,15 @@ var self = {
   luminanceSensor: wrap(function*(req, res) {
     var id = req.param('id');
     try {
-      var result = self._changeOnOffState(id, state, 'luminanceSensor', 1);
+      var result = yield self._changeOnOffState(id, state, 'luminanceSensor', 1);
       res.json(result);
     } catch (e) {
       res.json();
     }
 
   }),
-  _changeOnOffState: wrap(function*(id, state, requestedType, gpioNumber) {
-
+  _changeOnOffState: wrap(function*(id, state, requestedType, gpioNumber, type) {
+    type = type | 'inOut';
     var component = yield Component.findOne({
       _id: id
     }).populate('gpios').exec();
@@ -147,7 +147,7 @@ var self = {
       return self._getJsonFailedMessage('The number of gpios fos the component with id:"' + id + '"should be "' + gpioNumber + '".');
     }
 
-    return yield ComponentActions.changeOnOffState(component, state, 'out01');
+    return yield ComponentActions.changeOnOffState(component, state, type);
   }),
   _getJsonFailedMessage(message) {
     return {
