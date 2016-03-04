@@ -32,6 +32,7 @@ module.exports = {
         throw new Error('Almost one "out-gpio" is required by the component with id:"' + id + '".' );
       }
 
+
       return rp({
         method: 'Put',
         uri: "http://" + outGpio.ip + ":"+ Device.getAppPort() +"/api/gpios/" + outGpio.number + "/action" ,
@@ -45,7 +46,7 @@ module.exports = {
         if(response.body.status ==='failed'){
           throw new Error("Failed 'onSocker' in " + id +" component.");
         }
-        return response.body.status;
+        return response.body;
       });
 
     },
@@ -77,9 +78,9 @@ module.exports = {
       var out1 = outGpios[0];
       var out2 = outGpios[1];
 
-    var in1Value=0;
-    var out2Value=0;
-    var out2Value=0;
+      var in1Value=0;
+      var out2Value=0;
+      var out2Value=0;
 
       console.log(out1);
 
@@ -353,7 +354,7 @@ module.exports = {
           })
           .then(function (response) {
             console.log('desctivate updown relay');console.log('Activate general relay');
-            return Component.findOne(id).then(function(component) {
+            return Component.findOne({_id: id}).then(function(component) {
               component.value = requestTime;
               return component.save(function(error) {
                    if(error) {

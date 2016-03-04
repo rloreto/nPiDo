@@ -9,286 +9,157 @@ const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 const Component = mongoose.model('Component');
 const Gpio = mongoose.model('Gpio');
+const wrap = require('co-express');
 
 var self = {
-  getById: function(req, res) {
-    debugger;
+  getById: wrap(function*(req, res) {
     var id = req.query.id;
     if (!id) {
-      throw new Error('The id "' + id + '" is required.');
+      res.json(self._getJsonFailedMessage('The id "' + id + '" is required.'));
       return;
     }
-
-    Component.find({
+    try {
+      var component = yield Component.findOne({
         id: id
-      }).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component ' + id + ' not found');
-        }
-        return ComponentActions.updateGpiosValues(component[0]);
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
-      });
-  },
-  socket: function(req, res) {
-
+      }).populate('gpios').exec();
+      if (!component) {
+        throw new Error('The component ' + id + ' not found');
+      }
+      var result = yield ComponentActions.updateGpiosValues(component);
+      res.json(result);
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
+  socket: wrap(function*(req, res) {
     var state = req.param('state');
     var id = req.param('id');
-
     if (state !== 'on' && state !== 'off') {
-      throw new Error('The state should be "on" or "off"');
+      res.json(self._getJsonFailedMessage('The state should be "on" or "off"'));
     }
 
-    Component.findOne({_id: id}).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.type !== 'socket') {
-          throw new Error('The component type should be "socket" not "' + component.type + '".');
-        }
-        if (component && !component.gpios) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.gpios && component.gpios.length !== 1) {
-          throw new Error('The number of gpios fos the component with id:"' + id + '"should be 1.');
-        }
-
-        return ComponentActions.changeOnOffState(component, state, 'out01');
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
-      });
-  },
-  dimmer: function(req, res) {
+    try {
+      var result = yield self._changeOnOffState(id, state, 'socket', 1);
+      res.json(result);
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
+  dimmer: wrap(function*(req, res) {
     var state = req.param('state');
     var id = req.param('id');
 
     if (state !== 'on' && state !== 'off' && state !== 'change' && state !== 'start' && state !== 'stop' && state !== 'low' && state !== 'mediun' && state !== 'hight') {
-      throw new Error('The state should be "on","off","change","start","stop","low","mediun" or "hight"');
+      res.json(self._getJsonFailedMessage('The state should be "on","off","change","start","stop","low","mediun" or "hight"'));
     }
 
-    Component.findOne({_id: id}).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.type !== 'dimmer') {
-          throw new Error('The component type should be "dimmer" not "' + component.type + '".');
-        }
-        if (component && !component.gpios) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.gpios && component.gpios.length !== 1) {
-          throw new Error('The number of gpios for the component with id:"' + id + '"should be 1.');
-        }
-        return ComponentActions.changeDimmerState(component, state);
-
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
-      });
-  },
-  switch: function(req, res) {
+    try {
+      var result = self._changeOnOffState(id, state, 'dimmer', 1);
+      res.json(result);
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
+  switch: wrap(function*(req, res) {
     var state = req.param('state');
     var id = req.param('id');
 
     if (state !== 'on' && state !== 'off') {
-      throw new Error('The state should be "on" or "off"');
+      res.json(self._getJsonFailedMessage('The state should be "on" or "off"'));
     }
 
-    Component.findOne({_id: id}).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.type !== 'switch') {
-          throw new Error('The component type should be "switch" not "' + component.type + '".');
-        }
-        if (component && !component.gpios) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.gpios && component.gpios.length !== 3) {
-          throw new Error('The number of gpios fos the component with id:"' + id + '"should be 3.');
-        }
-
-        return ComponentActions.changeSwitchState(component, state);
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
-      });
-
-
-  },
-  switchBlind: function(req, res) {
+    try {
+      var result = self._changeOnOffState(id, state, 'switch', 3);
+      res.json(result);
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
+  switchBlind: wrap(function*(req, res) {
     var state = req.param('state');
     var id = req.param('id');
 
     if (state !== 'up' && state !== 'down' && state !== '0' && state !== '25' && state !== '50' && state !== '75' && state !== '100') {
-      throw new Error('The state should be "up", "down",  "0", "25", "50", "75" or "100"');
+      res.json(self._getJsonFailedMessage('The state should be "up", "down",  "0", "25", "50", "75" or "100"'));
     }
 
-    return Component.findOne({_id: id}).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component ' + id + ' not found');
-        }
-        if (component && component.type !== 'switchBlind') {
-          throw new Error('The component type should be "switchBlind" not "' + component.type + '".');
-        }
-        if (component && !component.gpios) {
-          throw new Error('The component ' + id + ' require gpios.');
-        }
-        if (component && component.gpios && component.gpios.length !== 2) {
-          throw new Error('The number of gpios fos the component with id:"' + id + '"should be 2.');
-        }
-
-        return ComponentActions.changeBlindPosition(component, state);
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
-      });
-  },
-  switchAudio: function(req, res) {
+    try {
+      var result = self._changeOnOffState(id, state, 'switchBlind', 2);
+      res.json(result);
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
+  switchAudio: wrap(function*(req, res) {
     var state = req.param('state');
     var id = req.param('id');
 
     if (state !== 'on' && state !== 'off') {
-      throw new Error('The state should be "on" or "off"');
+      res.json(self._getJsonFailedMessage('The state should be "on" or "off"'));
     }
-
-    Component.findOne({_id: id}).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.type !== 'switchAudio') {
-          throw new Error('The component type should be "switchAudio" not "' + component.type + '".');
-        }
-        if (component && !component.gpios) {
-          throw new Error('The component' + id + ' not found');
-        }
-        if (component && component.gpios && component.gpios.length !== 1) {
-          throw new Error('The number of gpios fos the component with id:"' + id + '"should be 1.');
-        }
-
-        return ComponentActions.changeOnOffState(component, state, 'out01');
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        console.log(result);
-        res.json(result);
-      });
-  },
+    try {
+      var result = self._changeOnOffState(id, state, 'switchAudio', 1);
+      res.json(result);
+    } catch (e) {
+      res.json(self._getJsonFailedMessage(e.message));
+    }
+  }),
   testAC: function(req, res) {
     res.json(true);
   },
-  temperatureSensor: function(req, res) {
+  temperatureSensor: wrap(function*(req, res) {
     var id = req.param('id');
 
-    Component.findOne({_id: id}).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component ' + id + ' not found');
-        }
-        if (component && component.type !== 'temperatureSensor') {
-          throw new Error('The component type should be "temperatureSensor" not "' + component.type + '".');
-        }
-        if (component && !component.gpios) {
-          throw new Error('The component ' + id + ' require gpios.');
-        }
-        if (component && component.gpios && component.gpios.length !== 1) {
-          throw new Error('The number of gpios fos the component with id:"' + id + '"should be 1.');
-        }
-
-        return ComponentActions.getDhtSensorTemperature(component);
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
+    try {
+      var result = self._changeOnOffState(id, state, 'temperatureSensor', 1);
+      res.json(result);
+    } catch (e) {
+      res.json({
+        status: 'failed',
+        error: e.message
       });
+    }
 
-  },
-  luminanceSensor: function(req, res) {
+  }),
+  luminanceSensor: wrap(function*(req, res) {
     var id = req.param('id');
-
-    Component.findOne({_id: id}).populate('gpios')
-      .exec()
-      .then(function(component) {
-        if (!component) {
-          throw new Error('The component ' + id + ' not found');
-        }
-        if (component && component.type !== 'luminanceSensor') {
-          throw new Error('The component type should be "luminanceSensor" not "' + component.type + '".');
-        }
-        if (component && !component.gpios) {
-          throw new Error('The component ' + id + ' require gpios.');
-        }
-        if (component && component.gpios && component.gpios.length !== 1) {
-          throw new Error('The number of gpios fos the component with id:"' + id + '"should be 1.');
-        }
-
-        return ComponentActions.getLuminanceSensor(component);
-      })
-      .catch(function(e) {
-        res.json({
-          status: 'failed',
-          error: e.message
-        });
-      })
-      .then(function(result) {
-        res.json(result);
+    try {
+      var result = self._changeOnOffState(id, state, 'luminanceSensor', 1);
+      res.json(result);
+    } catch (e) {
+      res.json({
+        status: 'failed',
+        error: e.message
       });
+    }
 
+  }),
+  _changeOnOffState: wrap(function*(id, state, requestedType, gpioNumber) {
+
+    var component = yield Component.findOne({
+      _id: id
+    }).populate('gpios').exec();
+
+    if (!component) {
+      throw new Error('The component' + id + ' not found');
+    }
+    if (component && component.type !== requestedType) {
+      throw new Error('The component type should be "' + requestedType + '" not "' + component.type + '".');
+    }
+    if (component && !component.gpios) {
+      throw new Error('The component' + id + ' not found');
+    }
+    if (component && component.gpios && component.gpios.length !== gpioNumber) {
+      throw new Error('The number of gpios fos the component with id:"' + id + '"should be "' + gpioNumber + '".');
+    }
+
+    return yield ComponentActions.changeOnOffState(component, state, 'out01');
+  }),
+  _getJsonFailedMessage(message) {
+    return {
+      status: 'failed',
+      error: message
+    };
   },
   get: function(req, res) {
     var filter = req.params.filter || {};
@@ -566,7 +437,9 @@ var self = {
       throw new Error('The id "' + id + '" is required.');
     }
 
-    Component.findOne({_id: id}).populate('gpios')
+    Component.findOne({
+        _id: id
+      }).populate('gpios')
       .then(function(component) {
         if (!component) {
           throw new Error('The component "' + id + '" not found.');
@@ -925,7 +798,7 @@ var self = {
         throw e;
       })
       .then(function(a) {
-				console.log(componentId);
+        console.log(componentId);
         return Gpio.find({
           owner: componentId
         }, "_id").then(function(result) {
@@ -935,7 +808,7 @@ var self = {
               gpios.push(gpio._id);
             });
           }
-					console.log(gpios);
+          console.log(gpios);
           return Component.update({
             _id: componentId
           }, {
