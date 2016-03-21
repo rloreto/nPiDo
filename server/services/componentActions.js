@@ -4,6 +4,39 @@ var Device = require('./device');
 require('array.prototype.find');
 
 module.exports = {
+  getComponentCurrentState: function*(component){
+    if (!component) {
+      throw new Error('The component is required.');
+    }
+
+    if (component.gpios.length === 0) {
+      throw new Error('Almost one gpio is required by the component with id:"' + component.id + '".');
+    }
+    var targetGpio = component.gpios[0];
+
+    var result = yield rp({
+      method: 'Get',
+      uri: "http://" + targetGpio.ip + ":" + Device.getAppPort() + "/api/gpios/" + targetGpio.number ,
+      resolveWithFullResponse: true
+    });
+
+    if (result.statusCode !== 200) {
+    throw new Error("Failed 'onSocker' in " + id + " component.");
+    }
+    if (result.body.status === 'failed') {
+      throw new Error("Failed 'onSocker' in " + id + " component.");
+    }
+    var resultObj =JSON.parse(result.body);
+
+    if(component.type==='socket'){
+      return (resultObj.gpio.value===1)? 0:1;
+    }
+    if(component.type==='audioSwitch'){
+      return (resultObj.gpio.value===1)? 1:0;
+    }
+
+    return 0;
+  },
   changeOnOffState: function*(component, state, type) {
 
     var outGpio = null;

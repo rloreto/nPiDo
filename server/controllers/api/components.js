@@ -157,12 +157,19 @@ var self = {
   get: wrap(function*(req, res) {
     var filter = req.params.filter || {};
     try {
-      var component = yield Component.find(filter).populate('gpios').exec();
-      res.json(component);
+      var components = yield Component.find(filter).populate('gpios').exec();
+
+      yield self._asyncEach(components, function*(component, i) {
+        component.value = yield ComponentActions.getComponentCurrentState(component);
+      })
+      res.json(components);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
     }
   }),
+  _asyncEach:function* (array, fn) {
+   for (var i = 0; i < array.length; i++) yield fn(array[i], i);
+  },
   create: function(req, res) {
     var obj = req.body;
     var type = obj.type;

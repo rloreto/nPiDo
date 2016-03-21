@@ -1,15 +1,20 @@
 import React from 'react';
 import GithubIcon from './github_icon';
 import {Button, IconButton} from 'react-toolbox/lib/button';
+import ComponentContainer from './componentContainer';
+import ComponentActions from '../actions/componentsActions';
+
 import style from './style';
+
 
 const ButtonTest = () => (
   <div>
+    <ComponentContainer></ComponentContainer>
     <section>
       <h5>Audio</h5>
       <p></p>
 
-      <Button icon='bookmark' label='Salon entero' accent/>
+      <Button icon='bookmark' label='Salon entero' accent raised/>
       <Button icon='bookmark' label='Salon y cocina' accent/>
       <Button icon='bookmark' label='Salon y baños' accent/>
       <Button icon='bookmark' label='Salon 1' primary/>
