@@ -29,10 +29,10 @@ module.exports = {
     var resultObj =JSON.parse(result.body);
 
     if(component.type==='socket'){
-      return (resultObj.gpio.value===1)? 0:1;
+      return !resultObj.gpio.value;
     }
-    if(component.type==='audioSwitch'){
-      return (resultObj.gpio.value===1)? 1:0;
+    if(component.type==='switchAudio'){
+      return resultObj.gpio.value;
     }
 
     return 0;
