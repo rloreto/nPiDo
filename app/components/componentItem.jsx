@@ -28,9 +28,23 @@ var ComponentList = React.createClass({
       ComponentsActions.changeComponentState(this.props.component, this.state.isActive );
     },
     render: function () {
+      var icon ;
+      switch (this.props.component.type) {
+        case 'socket':
+            this.state.icon='music_note';
+          break;
+        case 'switchAudio':
+            this.state.icon='volume_up';
+            break;
+        case 'dimmer':
+            this.state.icon='lightbulb_outline<';
+            break;
+        default:
+
+      }
       return (
         <div>
-          <Button icon='bookmark' label={this.props.component.name} key={this.props.component.id} data-id={this.props.component.id} accent raised={this.state.isActive  || this.props.component.isActive} onClick={this.changeComponentState}/>
+          <Button icon={this.state.icon} label={this.props.component.name} key={this.props.component.id} data-id={this.props.component.id} accent raised={this.state.isActive  || this.props.component.isActive} onClick={this.changeComponentState}/>
           <Button icon='delete' label='Delete' flat onClick={this.removeComponent}/>
         </div>
       );
