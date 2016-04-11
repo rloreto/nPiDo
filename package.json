@@ -110,12 +110,12 @@
   },
   "scripts": {
     "start": "NODE_ENV=development  ./node_modules/.bin/nodemon ./server.js",
-    "prod": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.15/nPiDo PORT=80 ./node_modules/.bin/nodemon ./server.js",
+    "prod": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.6/nPiDo PORT=80 ./node_modules/.bin/nodemon ./server.js",
     "debug": "NODE_ENV=development ./node_modules/.bin/nodemon --debug ./server.js",
     "debug-brk": "NODE_ENV=development ./node_modules/.bin/nodemon --debug-brk ./server.js",
-    "nowebpack": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.15/nPiDo PORT=3000 ./node_modules/.bin/nodemon  ./server.js",
-    "debug-nowebpack": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.15/nPiDo PORT=3000 ./node_modules/.bin/nodemon  --debug ./server.js",
-    "debug-brk-nowebpack": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.15/nPiDo PORT=3000 ./node_modules/.bin/nodemon  --debug-brk ./server.js",
+    "nowebpack": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.6/nPiDo PORT=3000 ./node_modules/.bin/nodemon  ./server.js",
+    "debug-nowebpack": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.6/nPiDo PORT=3000 ./node_modules/.bin/nodemon  --debug ./server.js",
+    "debug-brk-nowebpack": "NODE_ENV=production  MONGOHQ_URL=mongodb://10.0.2.6/nPiDo PORT=3000 ./node_modules/.bin/nodemon  --debug-brk ./server.js",
     "build": "rimraf dist && set NODE_ENV=production && webpack --config ./webpack.production.config.js --progress --profile --colors",
     "lint": "eslint ./ --ext .js,.jsx",
     "deploy": "gh-pages -d build"
