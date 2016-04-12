@@ -386,6 +386,8 @@ var self = {
     });
   },
   get: function(req, res) {
+    debugger;
+    console.log(req);
     var number = req.param('number');
     var gpioValue = 0;
     var error = self._checkNumber(number);
