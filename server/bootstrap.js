@@ -47,7 +47,7 @@ var self = {
                 for (var k = 0; k < component.gpios.length; k++) {
                   if (component.gpios[k].action === 'switch') {
                     try {
-
+                      console.log( "http://" + component.gpios[k].ip + ":" + DeviceService.getAppPort() + "/api/gpios/" + component.gpios[k].number);
                       var response = yield rp({
                         method: 'Get',
                         uri: "http://" + component.gpios[k].ip + ":" + DeviceService.getAppPort() + "/api/gpios/" + component.gpios[k].number,
@@ -73,7 +73,7 @@ var self = {
                       }
 
                     } catch (e) {
-                      console.log(e.message);
+                      //console.log(e.message);
                     }
                   }
                 }
