@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const Device = mongoose.model('Device');
 const Component = mongoose.model('Component');
 const suspend = require('suspend');
+var os = require("os");
 
 
 var self = {
@@ -16,9 +17,13 @@ var self = {
     var number = 0;
     var totalRetry = 100000;
     var ip = DeviceService.getIp();
+
+    var hostname = os.hostname();
     console.log('Device ip: ' + ip);
+    console.log('Device hostname: ' + hostname);
     var masterDevice = yield Device.find({
-      isMaster: true
+      isMaster: true,
+      name: hostname
     }).exec();
     if (masterDevice) {
       var switchComponents = yield Component.find({
