@@ -147,6 +147,7 @@ module.exports = {
             var address = interfaces[k][k2];
             if (address.family === 'IPv4' && !address.internal) {
                 addresses.push(address.address);
+                console.log(address);
             }
         }
     }
