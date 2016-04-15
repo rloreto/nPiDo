@@ -320,9 +320,6 @@ module.exports = {
     var action;
     var requestTime = 0;
     var targetGpio;
-    var resultGpios = component.gpios.filter(function(gpio) {
-      return gpio.action === action;
-    });
 
     if (state === 'up') {
       action = 'up';
@@ -358,6 +355,10 @@ module.exports = {
     if (!action) {
       return;
     }
+
+    var resultGpios = component.gpios.filter(function(gpio) {
+      return gpio.action === action;
+    });
 
     var formData = {
       state: requestState
