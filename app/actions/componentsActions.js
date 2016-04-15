@@ -36,7 +36,7 @@ ComponentsActions.upBlind.preEmit = function (component, targetState) {
   request.put('api/components/'+ component.type + '/' + component.id,  {state: 'up'},function () {});
 };
 
-ComponentsActions.downBind.preEmit = function (component, targetState) {
+ComponentsActions.downBlind.preEmit = function (component, targetState) {
   request.put('api/components/'+ component.type + '/' + component.id,  {state: 'down'},function () {});
 };
 
