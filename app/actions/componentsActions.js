@@ -10,7 +10,9 @@ var ComponentsActions = Reflux.createActions([
     "addComponent",
     "removeComponent",
     "changeComponentState",
-    "resortList"
+    "resortList",
+    "upBlind",
+    "downBind"
 ]);
 
 ComponentsActions.addComponent.preEmit = function (component) {
@@ -28,6 +30,14 @@ ComponentsActions.changeComponentState.preEmit = function (component, targetStat
     type = 'hight';
   }
   request.put('api/components/'+ component.type + '/' + component.id,  {state: changedComponenState, type: 'low'},function () {});
+};
+
+ComponentsActions.upBlind.preEmit = function (component, targetState) {
+  request.put('api/components/'+ component.type + '/' + component.id,  {type: 'up'},function () {});
+};
+
+ComponentsActions.downBind.preEmit = function (component, targetState) {
+  request.put('api/components/'+ component.type + '/' + component.id,  {type: 'down'},function () {});
 };
 
 
