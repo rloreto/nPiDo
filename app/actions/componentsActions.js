@@ -12,7 +12,7 @@ var ComponentsActions = Reflux.createActions([
     "changeComponentState",
     "resortList",
     "upBlind",
-    "downBind"
+    "downBlind"
 ]);
 
 ComponentsActions.addComponent.preEmit = function (component) {
