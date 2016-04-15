@@ -361,7 +361,8 @@ module.exports = {
     });
 
     var formData = {
-      state: requestState
+      state: requestState,
+      type: 'out01'
     };
     if (requestWait) {
       formData.wait = requestWait;
