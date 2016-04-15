@@ -32,7 +32,7 @@ module.exports = {
       return !resultObj.gpio.value;
     }
     if(component.type==='switchAudio'){
-      return resultObj.gpio.value;
+      return (resultObj.gpio.value===1)? 1:0;
     }
 
     return 0;
@@ -291,7 +291,7 @@ module.exports = {
       });
 
   },
-  changeBlindPosition: function(component, state) {
+  changeBlindPosition: function*(component, state) {
 
     var totalMilliseconds = 26 * 1000000;
     var id = null;
@@ -312,19 +312,18 @@ module.exports = {
     if (component.value) {
       currentBlindTime = component.value;
     }
+    debugger;
     console.log('currentBlindTime->' + currentBlindTime);
 
-    var generalGpio = component.gpios.find(function(gpio) {
-      return gpio.action === 'general';
-    })
-    var updownGpio = component.gpios.find(function(gpio) {
-      return gpio.action === 'updown';
-    })
 
     var ip, number;
     var requestState = 'onoff';
     var action;
     var requestTime = 0;
+    var targetGpio;
+    var resultGpios = component.gpios.filter(function(gpio) {
+      return gpio.action === action;
+    });
 
     if (state === 'up') {
       action = 'up';
@@ -345,7 +344,6 @@ module.exports = {
       if (state === '75') {
         requestTime = 0.75 * totalMilliseconds;
       }
-
       if (state === '100') {
         requestTime = totalMilliseconds;
       }
@@ -357,13 +355,10 @@ module.exports = {
         action = 'up';
         requestWait = currentBlindTime + requestTime;
       }
-
-
     }
     if (!action) {
       return;
     }
-
 
     var formData = {
       state: requestState
@@ -372,83 +367,19 @@ module.exports = {
       formData.wait = requestWait;
     }
 
-    var executeAction = function() {
-      return rp({
-          method: 'Put',
-          uri: "http://" + generalGpio.ip + ":" + Device.getAppPort() + "/api/gpios/" + generalGpio.number + "/action",
-          resolveWithFullResponse: true,
-          formData: formData
-        })
-        .then(function(response) {
-          console.log('Desactivate general relay');
-          if (response.statusCode !== 200) {
-            throw new Error("Failed 'onSocker' in " + id + " component.");
-          }
-          if (response.body.status === 'failed') {
-            throw new Error("Failed 'onSocker' in " + id + " component.");
-          }
-          console.log('desactivate general relay');
 
-
-          return rp({
-              method: 'Put',
-              uri: "http://" + updownGpio.ip + ":" + Device.getAppPort() + "/api/gpios/" + updownGpio.number + "/action",
-              resolveWithFullResponse: true,
-              formData: {
-                state: 'off'
-              }
-            })
-            .then(function(response) {
-              console.log('desctivate updown relay');
-              console.log('Activate general relay');
-              return Component.findOne({
-                _id: id
-              }).then(function(component) {
-                component.value = requestTime;
-                return component.save(function(error) {
-                  if (error) {
-                    // do something with the error.
-                  } else {
-                    // value saved!
-                    console.log("saved");
-                  }
-                });
-              });
-            });
-
-        });
-
+    if(resultGpios && resultGpios.length>0){
+        targetGpio = resultGpios[0];
     }
-
-    console.log('Start actions');
-
-    if (action === 'up') {
-      console.log('Activate updown relay (Up)');
-      return rp({
-          method: 'Put',
-          uri: "http://" + updownGpio.ip + ":" + Device.getAppPort() + "/api/gpios/" + updownGpio.number + "/action",
-          resolveWithFullResponse: true,
-          formData: {
-            state: 'on'
-          }
-        })
-        .then(function(response) {
-          if (response.statusCode !== 200) {
-            throw new Error("Failed 'onSocker' in " + id + " component.");
-          }
-          if (response.body.status === 'failed') {
-            throw new Error("Failed 'onSocker' in " + id + " component.");
-          }
-          console.log('Activate general relay');
-          return executeAction();
-        });
-
-    } else {
-      console.log('Activate general relay (Up)');
-      return executeAction();
-    }
+    var result = yield rp({
+      method: 'Put',
+      uri: "http://" + targetGpio.ip + ":" + Device.getAppPort() + "/api/gpios/" + targetGpio.number + "/action",
+      resolveWithFullResponse: true,
+      formData: formData
+    });
 
 
+    return result.body;
   },
   changeSwitchAudio: function() {
 

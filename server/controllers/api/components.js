@@ -89,7 +89,8 @@ var self = {
     }
 
     try {
-      var result = yield self._changeOnOffState(id, state, 'switchBlind', 2);
+      var component = yield Component.findOne({_id: id}).populate('gpios').exec();  
+      var result = yield ComponentActions.changeBlindPosition(component, state);
       res.json(result);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
