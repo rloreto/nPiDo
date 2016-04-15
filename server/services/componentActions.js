@@ -312,7 +312,6 @@ module.exports = {
     if (component.value) {
       currentBlindTime = component.value;
     }
-    debugger;
     console.log('currentBlindTime->' + currentBlindTime);
 
 
