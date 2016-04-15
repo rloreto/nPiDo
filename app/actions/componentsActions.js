@@ -33,11 +33,11 @@ ComponentsActions.changeComponentState.preEmit = function (component, targetStat
 };
 
 ComponentsActions.upBlind.preEmit = function (component, targetState) {
-  request.put('api/components/'+ component.type + '/' + component.id,  {type: 'up'},function () {});
+  request.put('api/components/'+ component.type + '/' + component.id,  {state: 'up'},function () {});
 };
 
 ComponentsActions.downBind.preEmit = function (component, targetState) {
-  request.put('api/components/'+ component.type + '/' + component.id,  {type: 'down'},function () {});
+  request.put('api/components/'+ component.type + '/' + component.id,  {state: 'down'},function () {});
 };
 
 
