@@ -45,7 +45,6 @@ var ComponentList = React.createClass({
       return (
         <div>
           <Button icon={this.state.icon} label={this.props.component.name} key={this.props.component.id} data-id={this.props.component.id} accent raised={this.state.isActive  || this.props.component.isActive} onClick={this.changeComponentState}/>
-          <Button icon='delete' label='Delete' flat onClick={this.removeComponent}/>
         </div>
       );
     }
