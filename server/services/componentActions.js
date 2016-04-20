@@ -323,10 +323,10 @@ module.exports = {
 
     if (state === 'up') {
       action = 'up';
-      requestWait = totalMilliseconds / 10.0;
+      requestWait = totalMilliseconds / 8.0;
     } else if (state === 'down') {
       action = 'down';
-      requestWait = totalMilliseconds / 10.0;
+      requestWait = totalMilliseconds / 8.0;
     } else {
       if (state === '0') {
         requestTime = 0;
