@@ -83,7 +83,10 @@ module.exports = {
     if (result.body.status === 'failed') {
       throw new Error("Failed 'onSocker' in " + id + " component.");
     }
-    return result.body;
+
+    component.value = state === 'on': 1:0;
+    return component;
+    //return result.body;
 
 
   },
