@@ -91,7 +91,8 @@ var self = {
     try {
       var component = yield Component.findOne({_id: id}).populate('gpios').exec();
       var result = yield ComponentActions.changeBlindPosition(component, state);
-      res.json(result);
+      component = yield Component.findOne({_id: id}).populate('gpios').exec();
+      res.json(component);
     } catch (e) {
       res.json(self._getJsonFailedMessage(e.message));
     }
