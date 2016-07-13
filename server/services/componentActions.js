@@ -335,13 +335,13 @@ module.exports = {
       requestState = 'on';
     } else if (state === 'upStop') {
       action = 'up';
-      requestState = 'on';
+      requestState = 'off';
     } else if (state === 'downStart') {
       action = 'down';
       requestState = 'on';
-    } else if (state === 'downStort') {
+    } else if (state === 'downStop') {
       action = 'down';
-      requestState = 'on';
+      requestState = 'off';
     } else {
       if (state === '0') {
         requestTime = 0;
