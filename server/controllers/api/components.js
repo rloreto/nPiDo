@@ -84,12 +84,12 @@ var self = {
     var state = req.param('state');
     var id = req.param('id');
 
-    if (state !== 'up' && state !== 'down' && state !== '0' && state !== '25' && state !== '50' && state !== '75' && state !== '100') {
-      res.json(self._getJsonFailedMessage('The state should be "up", "down",  "0", "25", "50", "75" or "100"'));
+    if (state !== 'up' && state !== 'down' && state !== 'upStart' && state !== 'upStop' && state !== 'downStart' && state !== 'downStop' && state !== '0' && state !== '25' && state !== '50' && state !== '75' && state !== '100') {
+      res.json(self._getJsonFailedMessage('The state should be "up", "down", "upStart",  "upStop", "downStart", "downStop", "0", "25", "50", "75" or "100"'));
     }
 
     try {
-      var component = yield Component.findOne({_id: id}).populate('gpios').exec();  
+      var component = yield Component.findOne({_id: id}).populate('gpios').exec();
       var result = yield ComponentActions.changeBlindPosition(component, state);
       res.json(result);
     } catch (e) {
