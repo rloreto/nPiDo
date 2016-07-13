@@ -84,7 +84,7 @@ module.exports = {
       throw new Error("Failed 'onSocker' in " + id + " component.");
     }
 
-    component.value = state === 'on'?1:0;
+    component.value = (state === 'on'?1:0);
     return component;
     //return result.body;
 
@@ -306,8 +306,8 @@ module.exports = {
       throw new Error("The component is required.");
     }
 
-    if (state !== 'up' && state !== 'down' && state !== '0' && state !== '25' && state !== '50' && state !== '75' && state !== '100') {
-      throw new Error('The state should be "up", "down", "0", "25", "50", "75" or "100"');
+    if (state !== 'up' && state !== 'down' && state !== 'upStart' && state !== 'upStop' && state !== 'downStart' && state !== 'downStop' && state !== '0' && state !== '25' && state !== '50' && state !== '75' && state !== '100') {
+      throw new Error('The state should be "up", "down", "upStart",  "upStop", "downStart", "downStop","0", "25", "50", "75" or "100"');
     }
 
     id = component.id;
@@ -330,6 +330,18 @@ module.exports = {
     } else if (state === 'down') {
       action = 'down';
       requestWait = totalMilliseconds / 8.0;
+    } else if (state === 'upStart') {
+      action = 'up';
+      requestState = 'on';
+    } else if (state === 'upStop') {
+      action = 'up';
+      requestState = 'on';
+    } else if (state === 'downStart') {
+      action = 'down';
+      requestState = 'on';
+    } else if (state === 'downStort') {
+      action = 'down';
+      requestState = 'on';
     } else {
       if (state === '0') {
         requestTime = 0;
